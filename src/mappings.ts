@@ -1,6 +1,7 @@
 import URI from "urijs";
 import { OreAggregation, Record } from "./inputModel";
 import { HeritageObject, MediaObject, OrganizationObject } from "./outputModel";
+import { getFirstOrOnly } from "./utils";
 
 function getLocationUri(inp: string): URI {
   // There is no location available in the OAI-PMH. Since the entire collection in each XML file belongs to a single museum with a single location we can hardcode Rotterdam and Enkhuizen?
@@ -69,32 +70,25 @@ export function fromOAIPMHRecord2HeritageObject(
 
 export function fromOAIPMHRecord2MediaObject(
   input: Record
-): MediaObject[] | undefined {
+): MediaObject | undefined {
   const aggregation = getAggregation(input);
-
   if (aggregation !== undefined) {
-    const images: URI[] = [];
-    // only this lowres image is available in the OAI-PMH dump
-    if (Array.isArray(aggregation["edm:object"])) {
-      aggregation["edm:object"].forEach((obj) => {
-        images.push(new URI(obj["@_rdf:resource"]));
-      });
-    } else {
-      images.push(new URI(aggregation["edm:object"]["@_rdf:resource"]));
-    }
-
-    const mediaObjects: MediaObject[] = [];
-    images.forEach((img) => {
-      const output: MediaObject = {
-        ID: new URI(img),
-        "rdf:type": "schema:ImageObject",
-        "schema:contentUrl": img,
-        "schema:encodingFormat": "",
-        "schema:license": new URI(aggregation["edm:rights"]["@_rdf:resource"]),
-      };
-      mediaObjects.push(output);
-    });
-    return mediaObjects;
+    const output: MediaObject = {
+      ID: new URI(
+        getFirstOrOnly<{ "@_rdf:resource": string }>(aggregation["edm:object"])[
+          "@_rdf:resource"
+        ]
+      ),
+      "rdf:type": "schema:ImageObject",
+      "schema:contentUrl": new URI(
+        getFirstOrOnly<{ "@_rdf:resource": string }>(aggregation["edm:object"])[
+          "@_rdf:resource"
+        ]
+      ),
+      "schema:encodingFormat": "",
+      "schema:license": new URI(aggregation["edm:rights"]["@_rdf:resource"]),
+    };
+    return output;
   } else {
     return undefined;
   }

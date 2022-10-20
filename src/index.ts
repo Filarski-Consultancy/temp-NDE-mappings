@@ -26,9 +26,9 @@ arrInput.forEach((inp) => {
   if (herObj !== undefined) {
     heritageObjects.push(herObj);
   }
-  const medObjs = fromOAIPMHRecord2MediaObject(inp);
-  if (medObjs !== undefined) {
-    mediaObjects.push(...medObjs);
+  const medObj = fromOAIPMHRecord2MediaObject(inp);
+  if (medObj !== undefined) {
+    mediaObjects.push(medObj);
   }
   const orgObj = fromOAIPMHRecord2OrganizationObject(inp);
   if (orgObj !== undefined) {
