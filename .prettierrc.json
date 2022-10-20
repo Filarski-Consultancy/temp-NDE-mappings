@@ -1,0 +1,6 @@
+{
+    "trailingComma": "all",
+    "proseWrap": "always",
+    "editor.formatOnSave": true,
+    "tabWidth": 4
+  }
